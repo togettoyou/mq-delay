@@ -21,11 +21,11 @@ const (
 
 func main() {
 	// 创建客户端
-	cli, err := mq_delay.NewCli(url)
+	cli, err := mq_delay.NewClient(url)
 	fail(err)
 
 	// 创建延时交换机
-	fail(cli.CreateDelayDirectExchange(delayExchangeName))
+	fail(cli.CreateDelayExchange(delayExchangeName))
 
 	// 构建消费者
 	consumer := cli.GetConsumer()
@@ -35,7 +35,7 @@ func main() {
 	fail(err)
 
 	// 绑定队列
-	fail(consumer.BindQueue(queue.Name, delayExchangeName, routingKey))
+	fail(consumer.BindQueue(queue.Name, delayExchangeName, routingKey, false, nil))
 
 	// 实时接受消息
 	fail(consumer.Receive(queue.Name, consumerTag, func(d amqp.Delivery) {
@@ -58,7 +58,7 @@ func main() {
 			defer cond.L.Unlock()
 			cond.Wait()
 			fmt.Println("开始")
-			fail(producer.SendTimeoutMsg(delayExchangeName, routingKey, "你好-"+time.Now().String(), 5))
+			fail(producer.SendTimeoutMsg(delayExchangeName, routingKey, []byte("你好-"+time.Now().String()), 5))
 		}()
 	}
 	go func() {
