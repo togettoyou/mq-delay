@@ -23,30 +23,20 @@ func main() {
 	// 创建客户端
 	cli, err := mq_delay.NewClient(url)
 	fail(err)
-
 	// 创建延时交换机
 	fail(cli.CreateDelayExchange(delayExchangeName))
 
 	// 构建消费者
 	consumer := cli.GetConsumer()
-
 	// 创建队列
 	queue, err := consumer.CreateQueue(queueName)
 	fail(err)
-
 	// 绑定队列
 	fail(consumer.BindQueue(queue.Name, delayExchangeName, routingKey, false, nil))
-
 	// 实时接受消息
 	fail(consumer.Receive(queue.Name, consumerTag, func(d amqp.Delivery) {
 		log.Println(d.DeliveryTag, string(d.Body))
 	}))
-
-	//go func() {
-	//	time.Sleep(10 * time.Second)
-	//	fmt.Println("停止接受消息")
-	//	consumer.StopReceive()
-	//}()
 
 	// 构建生产者
 	mu := sync.Mutex{}
@@ -65,7 +55,7 @@ func main() {
 		time.Sleep(10 * time.Second)
 		cond.Broadcast()
 	}()
-	http.ListenAndServe(":8999", nil)
+	fail(http.ListenAndServe(":8999", nil))
 }
 
 func fail(err error) {
