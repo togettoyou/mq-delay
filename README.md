@@ -1,17 +1,21 @@
 # 基于RabbitMQ实现的延时消息队列
+
 # 应用场景
 
 1. 对消息生产和消费有时间窗口要求的场景。例如，在电商交易中超时未支付关闭订单的场景，在订单创建时会发送一条延时消息。这条消息将会在30分钟以后投递给消费者，消费者收到此消息后需要判断对应的订单是否已完成支付。如支付未完成，则关闭订单。如已完成支付则忽略。
+
 1. 通过消息触发延时任务的场景。例如，在指定时间段之后向用户发送提醒消息。
+
 # 实现机制
-| 死信Exchange+Queue的消息存活时间 |
-|
-| :--- | :--- |
-| 死信Exchange+消息的消息存活时间 |
-|
+
+| 机制 | 实现 |
+| ------------ | ------------- |
+| 死信Exchange+Queue的消息存活时间 | |
+| 死信Exchange+消息的消息存活时间 | |
 | [rabbitmq-delayed-message-exchange插件](https://github.com/rabbitmq/rabbitmq-delayed-message-exchange) | ✔️ |
 
 # Example
+
 ```go
 package main
 
